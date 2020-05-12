@@ -11,6 +11,7 @@ const MongoStore = connectMongo(expressSession);
 
 const indexRouter = require('./routes/index');
 const authenticationRouter = require('./routes/authentication');
+const userAreaRouter = require('./routes/user-area');
 const User = require('./models/user');
 
 const app = express();
@@ -25,26 +26,27 @@ app.use(
   sassMiddleware({
     src: join(__dirname, 'public'),
     dest: join(__dirname, 'public'),
-    outputStyle: process.env.NODE_ENV === 'development' ? 'nested' : 'compressed',
+    outputStyle:
+      process.env.NODE_ENV === 'development' ? 'nested' : 'compressed',
     sourceMap: false,
-    force: true
+    force: true,
   })
 );
 app.use(express.static(join(__dirname, 'public')));
 
 app.use(
   expressSession({
-    secret: process.env.SESSION_SECRET,
+    secret: 'ashahsuahsuahsu', //process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: false,
     cookie: {
       maxAge: 60 * 60 * 24 * 15,
-      httpOnly: true
+      httpOnly: true,
     },
     store: new MongoStore({
       mongooseConnection: mongoose.connection,
-      ttl: 60 * 60 * 24
-    })
+      ttl: 60 * 60 * 24,
+    }),
   })
 );
 
@@ -52,12 +54,12 @@ app.use((req, res, next) => {
   const userId = req.session.user;
   if (userId) {
     User.findById(userId)
-      .then(user => {
+      .then((user) => {
         req.user = user;
         res.locals.user = req.user;
         next();
       })
-      .catch(error => {
+      .catch((error) => {
         next(error);
       });
   } else {
@@ -67,6 +69,7 @@ app.use((req, res, next) => {
 
 app.use('/', indexRouter);
 app.use('/', authenticationRouter);
+app.use('/profile', userAreaRouter);
 
 app.use('*', (req, res, next) => {
   const error = new Error('Page not found.');

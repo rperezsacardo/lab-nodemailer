@@ -5,21 +5,31 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
     email: {
       type: String,
       required: true,
       lowercase: true,
-      trim: true
+      trim: true,
     },
+    status: {
+      type: String,
+      enum: ['Pending Confirmation', 'Active'], // true or false ?
+      default: 'Pending Confirmation',
+    },
+
+    confirmationCode: {
+      type: String,
+    },
+
     passwordHash: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
